@@ -38,22 +38,22 @@ void setup() {
 
 void loop() {
 
-  /*Serial.println("Begin loop");
+  Serial.println("Begin loop");
   myMotor1->step(100, FORWARD, SINGLE);
   delay(200);
   myMotor1->step(100, BACKWARD, SINGLE);
-  myMotor2->step(900, FORWARD, SINGLE);*/
+  myMotor2->step(900, FORWARD, SINGLE);
   myMotor1->step(1400, FORWARD, DOUBLE);
   delay(1000);
   myMotor1->step(500, BACKWARD, DOUBLE);
   delay(2000);
-  /*myMotor2->step(2300, FORWARD, SINGLE);
+  myMotor2->step(2300, FORWARD, SINGLE);
   myMotor1->step(1400, FORWARD, DOUBLE);
   delay(1000);
   myMotor1->step(500, BACKWARD, DOUBLE);
   delay(2000);
   myMotor2->step(3200, BACKWARD, SINGLE);
-  delay(2000);*/
+  delay(2000);
 
   /*Serial.println("Begin loop");
   myMotor1->step(100, FORWARD, DOUBLE);
