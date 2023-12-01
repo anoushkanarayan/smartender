@@ -36,8 +36,33 @@ void setup() {
   myMotor2->setSpeed(20);  // 10 rpm
 }
 
+unsigned long getUserInputBlocking(const char * message) {
+  unsigned long result = 0;
+  bool receiving = true;
+  bool acquisitionStarted = false;
+  Serial.println(message);
+  do {
+    int r = Serial.peek();
+    if (r != -1) { // got something
+      if (isdigit(r)) {
+        acquisitionStarted = true;
+        Serial.read(); // remove the byte from the incoming stream
+        result = 10 * result + (r - '0'); // do the math, might overflow.
+      } else {
+        if (acquisitionStarted) {
+          receiving = false; // we are done
+        } else {
+          Serial.read(); // ignore that byte and remove it from the incoming stream
+        }
+      }
+    }
+  } while (receiving);
+  return result;
+}
+
 void loop() {
 
+  int numSteps = getUserInputBlocking("type please");
   Serial.println("Begin loop");
   myMotor1->step(100, FORWARD, SINGLE);
   delay(200);
@@ -45,12 +70,12 @@ void loop() {
   myMotor2->step(900, FORWARD, SINGLE);
   myMotor1->step(1400, FORWARD, DOUBLE);
   delay(1000);
-  myMotor1->step(500, BACKWARD, DOUBLE);
+  myMotor1->step(520, BACKWARD, DOUBLE);
   delay(2000);
   myMotor2->step(2300, FORWARD, SINGLE);
   myMotor1->step(1400, FORWARD, DOUBLE);
   delay(1000);
-  myMotor1->step(500, BACKWARD, DOUBLE);
+  myMotor1->step(600, BACKWARD, DOUBLE);
   delay(2000);
   myMotor2->step(3200, BACKWARD, SINGLE);
   delay(2000);
