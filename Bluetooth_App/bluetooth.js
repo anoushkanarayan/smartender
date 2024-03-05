@@ -42,7 +42,14 @@ function sendData(command) {
   const inputValue = command;
   if (!("TextEncoder" in window)) {
     console.log("Sorry, this browser does not support TextEncoder...");
+    return;
   }
   var enc = new TextEncoder(); // always utf-8
-  blueToothCharacteristic.writeValue(enc.encode(inputValue));
+  blueToothCharacteristic.writeValue(enc.encode(inputValue))
+  .then(() => {
+    console.log(`Command "${inputValue}" sent`);
+  })
+  .catch((error) => { // Catch any errors that occur during the write
+    console.error('Error sending command:', error);
+  });
 }
