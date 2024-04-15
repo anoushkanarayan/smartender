@@ -3,8 +3,6 @@ function connectToBle() {
   blueTooth.connect(0xFFE0, gotCharacteristics);
 }
 
-
-// A function that will be called once got characteristics
 function gotCharacteristics(error, characteristics) {
   if (error) { 
     console.log('error: ', error);
@@ -16,12 +14,9 @@ function gotCharacteristics(error, characteristics) {
   
   
   isConnected = blueTooth.isConnected();
-  // Add a event handler when the device is disconnected
   blueTooth.onDisconnected(onDisconnected);
 }
 
-
-// A function that will be called once got values
 function gotValue(value) {
   console.log('value: ', value);
   if (value == 'Push Button') {
@@ -31,25 +26,16 @@ function gotValue(value) {
   }
 }
 
-
 function onDisconnected() {
   console.log('Device got disconnected.');
   isConnected = false;
 }
 
-
 function sendData(command) {
   const inputValue = command;
   if (!("TextEncoder" in window)) {
     console.log("Sorry, this browser does not support TextEncoder...");
-    return;
   }
   var enc = new TextEncoder(); // always utf-8
-  blueToothCharacteristic.writeValue(enc.encode(inputValue))
-  .then(() => {
-    console.log(`Command "${inputValue}" sent`);
-  })
-  .catch((error) => { // Catch any errors that occur during the write
-    console.error('Error sending command:', error);
-  });
+  blueToothCharacteristic.writeValue(enc.encode(inputValue));
 }
