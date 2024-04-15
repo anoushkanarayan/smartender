@@ -1,3 +1,3 @@
 # SmarTender
 
-Fall Showcase - No GUI, one drink from 2 dispensers
+Fall Showcase - No GUI, one mixed drink from 2 dispensers
