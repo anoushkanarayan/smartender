@@ -2,7 +2,7 @@ function drawScreen() {
   textSize(18);
   if (isConnected) {
     //background(0, 255, 0);
-    text('  Connected :)', 180, 15);
+    //text('  Connected :)', 180, 15);
   } else {
     background(130, 92, 180);
     textAlign(LEFT, TOP);

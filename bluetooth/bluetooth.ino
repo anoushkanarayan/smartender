@@ -30,14 +30,17 @@ const uint8_t pushButtonPin = 6;
 SoftwareSerial bluetooth(bluTX_ardRXpin, bluRX_ardTXpin);
 
 // Create the motor shield object with the default I2C address
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x60);
+Adafruit_MotorShield AFMS2 = Adafruit_MotorShield(0x61);
 // Or, create it with a different I2C address (say for stacking)
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
 
 // Connect a stepper motor with 200 steps per revolution (1.8 degree)
 // to motor port #2 (M3 and M4)
-Adafruit_StepperMotor *myMotor1 = AFMS.getStepper(10000, 2);
-Adafruit_StepperMotor *myMotor2 = AFMS.getStepper(10000, 1);
+Adafruit_StepperMotor *y = AFMS.getStepper(10000, 2);
+Adafruit_StepperMotor *x = AFMS.getStepper(10000, 1);
+Adafruit_StepperMotor *z = AFMS2.getStepper(10000, 2);
+//Adafruit_StepperMotor *myMotor4 = AFMS2.getStepper(10000, 1);
 
 
 //function prototypes
@@ -59,8 +62,16 @@ void setup() {
   }
   Serial.println("Motor Shield found.");
 
-  myMotor1->setSpeed(10);
-  myMotor2->setSpeed(20);  // 10 rpm
+  if (!AFMS2.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield 2. Check wiring.");
+    while (1);
+  }
+  Serial.println("Motor Shield found.");
+
+  y->setSpeed(30);
+  x->setSpeed(40);  // 10 rpm
+  z->setSpeed(100);
 }
 
 void loop() {
@@ -93,10 +104,21 @@ void checkBluetooth() {
       analogWrite(LED_Pin, 255);
     } else if (strstr(charBuffer, "Drink1") == &charBuffer[0]) {
 
-      Serial.println("Begin loop");
-      myMotor1->step(300, FORWARD, SINGLE);
+      Serial.println("Begin motor sequence for y");
+      y->step(300, FORWARD, SINGLE);
+      delay(1000);
+      y->step(300, BACKWARD, SINGLE);
+
+      /*Serial.println("Begin motor sequence for x");
+      x->step(1000, FORWARD, SINGLE);
+      delay(1000);
+      x->step(1000, BACKWARD, SINGLE);
+
+      Serial.println("Begin motor sequence for z");
+      z->step(2000, FORWARD, SINGLE);
       delay(2000);
-      myMotor1->step(300, BACKWARD, SINGLE);
+      z->step(1700, BACKWARD, SINGLE);*/
+
       
     }
 

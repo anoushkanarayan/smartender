@@ -28,3 +28,7 @@ function Drink6() {
   sendData("Drink6\n");
   console.log('Got here6');
 }
+function Drink7() {
+  sendData("Drink6\n");
+  console.log('Got here7');
+}
