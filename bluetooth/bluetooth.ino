@@ -26,8 +26,8 @@ const uint8_t LED_Pin = 8;
 // Push Button
 const uint8_t pushButtonPin = 6;
 
-const uint8_t limitSwitchXPin = 8; // X direction limit switch
-const uint8_t limitSwitchYPin = 9; // Y direction limit switch
+const uint8_t limitSwitchXPin = 4; // X direction limit switch
+const uint8_t limitSwitchYPin = 5; // Y direction limit switch
 
 SoftwareSerial bluetooth(bluTX_ardRXpin, bluRX_ardTXpin);
 
@@ -99,48 +99,42 @@ void setup() {
 
 }
 
-void loop() {
-  if (!digitalRead(limitSwitchXPin)) { // Check if X limit switch is pressed
-    Serial.println("X Limit Reached");
-    x->release(); // Stop or reverse motor here
-  }
+/*void loop() {
+  bool xState = digitalRead(limitSwitchXPin);
+  bool yState = digitalRead(limitSwitchYPin);
+  Serial.print("X Limit State: ");
+  Serial.print(xState);
+  Serial.print(" | Y Limit State: ");
+  Serial.println(yState);
+  delay(500); // Update every half second
+}*/
 
-  if (!digitalRead(limitSwitchYPin)) { // Check if Y limit switch is pressed
-    Serial.println("Y Limit Reached");
-    y->release(); // Stop or reverse motor here
-  }
+void loop() {
 
   char* drinkCode = checkBluetooth();
 
-  /*if (drinkCode) {
-    int x = 0, y = 0;
-    for (int i = 0; i < DISPENSERS; i++) {
-      int drinkAmount = drinkCode[i] - '0';
-      if (drinkAmount > 0) {
-        // move horizontal stepper DISPENSERS_OFFSETS[i][0] - x steps
-        // move vertical stepper DISPENSERS_OFFSETS[i][1] - y steps
+}
 
-        // Serial.println("Begin loop");
-        // myMotor1->step(300, FORWARD, SINGLE);
-        // delay(2000);
-        // myMotor1->step(300, BACKWARD, SINGLE);
+void homeAxes() {
+  Serial.println("Homing in progress...");
 
-        for (int j = 0; j < drinkAmount; j++) {
-          // push up
-          // come back down
-        }
-      }
-    }
-  }*/
-
-  if (!digitalRead(pushButtonPin)) { // send out
-    bluetooth.print("Push Button");
-    while (!digitalRead(pushButtonPin)) {
-
-    }
-    delay(20);
-    bluetooth.print(" ");
+  // Home X-axis
+  Serial.println("Homing X-axis");
+  while (!digitalRead(limitSwitchXPin)) { // While the limit switch is not pressed
+    x->step(1, BACKWARD, SINGLE); // Move the stepper motor forward by one step
   }
+  x->release(); // Release the stepper motor
+  Serial.println("X-axis homed");
+
+  // Home Y-axis
+  Serial.println("Homing Y-axis");
+  while (!digitalRead(limitSwitchYPin)) { // While the limit switch is not pressed
+    y->step(1, FORWARD, SINGLE); // Move the stepper motor forward by one step
+    y2->step(1, FORWARD, SINGLE); // Move the second Y motor in sync
+  }
+  y->release(); // Release the stepper motor
+  y2->release(); // Release the second Y stepper motor
+  Serial.println("Y-axis homed");
 }
 
 char* checkBluetooth() {
@@ -158,66 +152,59 @@ char* checkBluetooth() {
       analogWrite(LED_Pin, 255);
     } else if (strstr(charBuffer, "Drink1") == &charBuffer[0]) {
 
-      /*Serial.println("Begin motor sequence for y");
-      for(int i=0; i<300; i++) {
-        y->step(1, FORWARD, SINGLE);
-        y2->step(1, BACKWARD, SINGLE);
-      }
-      delay(1000);
-      for(int i=0; i<300; i++) {
-        y->step(1, BACKWARD, SINGLE);
-        y2->step(1, FORWARD, SINGLE);
-      }*/
-      
-      Serial.println("Begin motor sequence for x");
-      x->step(1000, FORWARD, SINGLE);
-      delay(1000);
      
-      Serial.println("Begin motor sequence for z");
+      /*Serial.println("Begin motor sequence for z");
       z->step(1350, FORWARD, SINGLE);
       delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, BACKWARD, SINGLE);*/
 
       Serial.println("Begin motor sequence for x");
-      x->step(1020, FORWARD, SINGLE);
+      x->step(1820, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
+      /*z->step(1350, FORWARD, SINGLE);
       delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, BACKWARD, SINGLE);*/
 
-      x->step(2200, FORWARD, SINGLE);
+      x->step(1050, FORWARD, SINGLE);
       delay(1000);
 
-      for(int i=0; i<650; i++) {
+      /*z->step(1350, FORWARD, SINGLE);
+      delay(2000);
+      z->step(1350, BACKWARD, SINGLE);*/
+
+      x->step(2050, FORWARD, SINGLE);
+      delay(1000);
+
+      for(int i=0; i<700 ; i++) {
         y->step(1, BACKWARD, SINGLE);
         y2->step(1, BACKWARD, SINGLE);
       }
 
-      z->step(1350, FORWARD, SINGLE);
+      /*z->step(1350, FORWARD, SINGLE);
       delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, BACKWARD, SINGLE);*/
+
+
+      delay(10000);
+      homeAxes();
 
       
-    } /*else if (strstr(charBuffer, "Drink2") == &charBuffer[0]) {
+    } else if (strstr(charBuffer, "Drink2") == &charBuffer[0]) {
 
-      Serial.println("Begin motor sequence for y");
-      y->step(300, FORWARD, SINGLE);
+      for(int i=0; i<1600; i++) {
+        y->step(1, BACKWARD, SINGLE);
+        y2->step(1, BACKWARD, SINGLE);
+      }
+
+      x->step(1550, FORWARD, SINGLE);
       delay(1000);
-      y->step(300, BACKWARD, SINGLE);
 
-      /*Serial.println("Begin motor sequence for x");
       x->step(1000, FORWARD, SINGLE);
       delay(1000);
-      x->step(1000, BACKWARD, SINGLE);
-     
-      Serial.println("Begin motor sequence for z");
-      z->step(2000, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1700, BACKWARD, SINGLE);
 
       
-    } else if (strstr(charBuffer, "Drink3") == &charBuffer[0]) {
+    } /*else if (strstr(charBuffer, "Drink3") == &charBuffer[0]) {
 
       Serial.println("Begin motor sequence for y");
       y->step(300, FORWARD, SINGLE);
