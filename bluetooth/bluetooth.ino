@@ -15,14 +15,13 @@
 
 #include <SoftwareSerial.h>
 #include <Adafruit_MotorShield.h>
+#include <Stepper.h>
 
 // Pins  ************************
 // UART TO HM10 Module
 const uint8_t bluRX_ardTXpin = 3;
 const uint8_t bluTX_ardRXpin = 2;
 
-// RGB LED
-const uint8_t LED_Pin = 8;
 // Push Button
 const uint8_t pushButtonPin = 6;
 
@@ -47,6 +46,9 @@ Adafruit_StepperMotor *y = AFMS.getStepper(10000, 2);
 Adafruit_StepperMotor *x = AFMS.getStepper(10000, 1);
 Adafruit_StepperMotor *y2 = AFMS2.getStepper(10000, 2);
 Adafruit_StepperMotor *z = AFMS2.getStepper(10000, 1);
+
+const int stepsPerRevolution = 200;
+Stepper iceDispo(stepsPerRevolution, 6, 7, 8, 9);
 
 //Adafruit_StepperMotor *myMotor4 = AFMS2.getStepper(10000, 1);
 
@@ -97,6 +99,7 @@ void setup() {
   x->setSpeed(40);  // 10 rpm
   z->setSpeed(100);
 
+  iceDispo.setSpeed(10);
 }
 
 /*void loop() {
@@ -137,6 +140,12 @@ void homeAxes() {
   Serial.println("Y-axis homed");
 }
 
+void dispenseIce() {
+  Serial.println("Dispensing Ice...");
+  iceDispo.step(50);
+  delay(2500);
+}
+
 char* checkBluetooth() {
   char charBuffer[20];
   if (bluetooth.available() > 0) {
@@ -145,32 +154,24 @@ char* checkBluetooth() {
         Serial.print("Received: ");
         Serial.println(charBuffer);
 
-    if (strstr(charBuffer, "LED OFF") == &charBuffer[0]) {
-      Serial.println("Turning LED OFF");
-      analogWrite(LED_Pin, 0);
-    } else if (strstr(charBuffer, "LED ON") == &charBuffer[0]) {
-      analogWrite(LED_Pin, 255);
-    } else if (strstr(charBuffer, "Drink1") == &charBuffer[0]) {
+    if (strstr(charBuffer, "Drink1") == &charBuffer[0]) {
+      dispenseIce();
 
       x->step(1820, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
       x->step(1050, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
       x->step(2050, FORWARD, SINGLE);
-
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
 
       delay(1000);
 
@@ -179,16 +180,15 @@ char* checkBluetooth() {
         y2->step(1, BACKWARD, SINGLE);
       }
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
-
-      delay(10000);
       homeAxes();
 
       
     } else if (strstr(charBuffer, "Drink2") == &charBuffer[0]) {
+      dispenseIce();
 
       for(int i=0; i<700 ; i++) {
         y->step(1, BACKWARD, SINGLE);
@@ -198,26 +198,26 @@ char* checkBluetooth() {
       x->step(2870, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
       x->step(975, FORWARD, SINGLE);
       delay(1000);
 
       homeAxes();
-
       
     } else if (strstr(charBuffer, "Drink3") == &charBuffer[0]) {
+      dispenseIce();
 
       x->step(3770, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
-      x->step(1100, FORWARD, SINGLE);
+      x->step(1500, FORWARD, SINGLE);
       delay(1000);
 
       for(int i=0; i<700 ; i++) {
@@ -226,29 +226,31 @@ char* checkBluetooth() {
       }
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
       x->step(1075, BACKWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+      delay(1000);
 
       homeAxes();
       
     } else if (strstr(charBuffer, "Drink4") == &charBuffer[0]) {
+      dispenseIce();
 
       x->step(1820, FORWARD, SINGLE);
 
       x->step(1050, FORWARD, SINGLE);
       delay(1000);
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
 
       x->step(2050, FORWARD, SINGLE);
       delay(1000);
@@ -258,70 +260,94 @@ char* checkBluetooth() {
         y2->step(1, BACKWARD, SINGLE);
       }
 
-      z->step(1350, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1350, BACKWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+      delay(1000);
 
-
-      delay(10000);
       homeAxes();
 
       
-    } /*else if (strstr(charBuffer, "Drink5") == &charBuffer[0]) {
+    } else if (strstr(charBuffer, "Drink5") == &charBuffer[0]) {
+      dispenseIce();
 
-      Serial.println("Begin motor sequence for y");
-      y->step(300, FORWARD, SINGLE);
+      x->step(3770, FORWARD, SINGLE);
       delay(1000);
-      y->step(300, BACKWARD, SINGLE);
 
-      Serial.println("Begin motor sequence for x");
-      x->step(1000, FORWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+
+      for(int i=0; i<700 ; i++) {
+        y->step(1, BACKWARD, SINGLE);
+        y2->step(1, BACKWARD, SINGLE);
+      }
+
+      x->step(1950, BACKWARD, SINGLE);
       delay(1000);
-      x->step(1000, BACKWARD, SINGLE);
-     
-      Serial.println("Begin motor sequence for z");
-      z->step(2000, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1700, BACKWARD, SINGLE);
 
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+      delay(1000);
+
+      homeAxes();
       
     } else if (strstr(charBuffer, "Drink6") == &charBuffer[0]) {
+      dispenseIce();
 
-      Serial.println("Begin motor sequence for y");
-      y->step(300, FORWARD, SINGLE);
+      x->step(1820, FORWARD, SINGLE);
       delay(1000);
-      y->step(300, BACKWARD, SINGLE);
 
-      Serial.println("Begin motor sequence for x");
-      x->step(1000, FORWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+
+      x->step(1050, FORWARD, SINGLE);
+      x->step(2050, FORWARD, SINGLE);
+
       delay(1000);
-      x->step(1000, BACKWARD, SINGLE);
-     
-      Serial.println("Begin motor sequence for z");
-      z->step(2000, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1700, BACKWARD, SINGLE);
+
+      for(int i=0; i<700 ; i++) {
+        y->step(1, BACKWARD, SINGLE);
+        y2->step(1, BACKWARD, SINGLE);
+      }
+
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+      delay(1000);
+
+      homeAxes();
 
       
     } else if (strstr(charBuffer, "Drink7") == &charBuffer[0]) {
+      dispenseIce();
 
-      Serial.println("Begin motor sequence for y");
-      y->step(300, FORWARD, SINGLE);
+      for(int i=0; i<700 ; i++) {
+        y->step(1, BACKWARD, SINGLE);
+        y2->step(1, BACKWARD, SINGLE);
+      }
+
+      x->step(3800, FORWARD, SINGLE);
       delay(1000);
-      y->step(300, BACKWARD, SINGLE);
 
-      Serial.println("Begin motor sequence for x");
-      x->step(1000, FORWARD, SINGLE);
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
       delay(1000);
-      x->step(1000, BACKWARD, SINGLE);
-     
-      Serial.println("Begin motor sequence for z");
-      z->step(2000, FORWARD, SINGLE);
-      delay(2000);
-      z->step(1700, BACKWARD, SINGLE);
 
+      x->step(1100, FORWARD, SINGLE);
+      delay(1000);
+  
+      z->step(1350, FORWARD, DOUBLE);
+      delay(2500);
+      z->step(1350, BACKWARD, DOUBLE);
+      delay(1000);
+
+      homeAxes();
       
-    }*/
+    }
     Serial.print("Received: ");
     Serial.println(charBuffer);
 
