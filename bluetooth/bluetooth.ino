@@ -192,16 +192,18 @@ char* checkBluetooth() {
       
     } else if (strstr(charBuffer, "Drink2") == &charBuffer[0]) {
 
-      for(int i=0; i<1600; i++) {
+      for(int i=0; i<700 ; i++) {
         y->step(1, BACKWARD, SINGLE);
         y2->step(1, BACKWARD, SINGLE);
       }
 
-      x->step(1550, FORWARD, SINGLE);
+      x->step(2870, FORWARD, SINGLE);
       delay(1000);
 
-      x->step(1000, FORWARD, SINGLE);
+      x->step(975, FORWARD, SINGLE);
       delay(1000);
+
+      homeAxes();
 
       
     } /*else if (strstr(charBuffer, "Drink3") == &charBuffer[0]) {
